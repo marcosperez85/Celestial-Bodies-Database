@@ -1,0 +1,157 @@
+For this project, you need to log in to PostgreSQL with psql to create your database. Do that by entering psql --username=freecodecamp --dbname=postgres in the terminal. Make all the tests below pass to complete the project. Be sure to get creative, and have fun!
+
+Don't forget to connect to your database after you create it 😄
+
+Here's some ideas for other column and table names: description, has_life, is_spherical, age_in_millions_of_years, planet_types, galaxy_types, distance_from_earth.
+
+Notes:
+If you leave your virtual machine, your database may not be saved. You can make a dump of it by entering pg_dump -cC --inserts -U freecodecamp universe > universe.sql in a bash terminal (not the psql one). It will save the commands to rebuild your database in universe.sql. The file will be located where the command was entered. If it's anything inside the project folder, the file will be saved in the VM. You can rebuild the database by entering psql -U postgres < universe.sql in a terminal where the .sql file is.
+
+If you are saving your progress on freeCodeCamp.org, after getting all the tests to pass, follow the instructions above to save a dump of your database. Save the universe.sql file in a public repository and submit the URL to it on freeCodeCamp.org.
+
+Complete the tasks below
+
+LISTO You should create a database named universe
+LISTO Be sure to connect to your database with \c universe. Then, you should add tables named galaxy, star, planet, and moon
+LISTO Each table should have a primary key
+LISTO Each primary key should automatically increment
+LISTO Each table should have a name column
+LISTO You should use the INT data type for at least two columns that are not a primary or foreign key
+LISTO You should use the NUMERIC data type at least once
+LISTO You should use the TEXT data type at least once
+LISTO You should use the BOOLEAN data type on at least two columns
+LISTO Each 'star' should have a foreign key that references one of the rows in galaxy
+LISTO Each 'planet' should have a foreign key that references one of the rows in star
+LISTO Each 'moon' should have a foreign key that references one of the rows in planet
+LISTO Your database should have at least five tables
+LISTO Each table should have at least three rows
+LISTO The galaxy and star tables should each have at least six rows
+LISTO The planet table should have at least 12 rows
+LISTO The moon table should have at least 20 rows
+LISTO Each table should have at least three columns
+LISTO The galaxy, star, planet, and moon tables should each have at least five columns
+LISTO At least two columns per table should not accept NULL values
+LISTO At least one column from each table should be required to be UNIQUE
+LISTO All columns named name should be of type VARCHAR
+LISTO Each primary key column should follow the naming convention table_name_id. For example, the moon table should have a primary key column named moon_id
+LISTO Each foreign key column should have the same name as the column it is referencing
+
+psql --username=freecodecamp --dbname=postgres;
+
+DROP DATABASE universe;
+
+CREATE DATABASE universe;
+
+\c universe;
+
+CREATE TABLE galaxy(
+	galaxy_id SERIAL,
+	name VARCHAR(20) NOT NULL UNIQUE,
+	description TEXT,
+	diameter_lightYears INT,
+	numberOfStars INT,
+	PRIMARY KEY(galaxy_id)
+);
+
+CREATE TABLE star(
+	star_id SERIAL,
+	name VARCHAR(20) NOT NULL UNIQUE,
+	description TEXT,
+	diameter_inKm INT,
+	age_millionOfYears INT,
+	galaxy_id INT REFERENCES galaxy(galaxy_id),
+	PRIMARY KEY(star_id)
+);
+
+CREATE TABLE planet(
+	planet_id SERIAL,
+	name VARCHAR(20) NOT NULL UNIQUE,
+	description TEXT,
+	diameter_inKm INT,
+	age_millionOfYears INT,
+	oxigen_percentage NUMERIC,
+	is_flat BOOLEAN,
+	has_life BOOLEAN,
+	star_id INT REFERENCES star(star_id),
+	PRIMARY KEY(planet_id)
+);
+
+CREATE TABLE moon(
+	moon_id SERIAL,
+	name VARCHAR(20) NOT NULL UNIQUE,
+	description TEXT,
+	diameter_inKm INT,
+	age_millionOfYears INT,
+	planet_id INT REFERENCES planet(planet_id),
+	PRIMARY KEY(moon_id)
+);
+
+CREATE TABLE continent(
+	continent_id SERIAL PRIMARY KEY,
+	name VARCHAR(20) NOT NULL UNIQUE,
+	description TEXT,
+	numberOfCountries INT,
+	planet_id INT REFERENCES planet(planet_id)
+);
+
+INSERT INTO galaxy(name,description,diameter_lightYears,numberOfStars) VALUES
+('Milky Way', 'It is a barred spiral galaxy that is home to our Solar System', 120000, 400),
+('Andromeda','The nearest major galaxy to the Milky Way',220,100000),
+('Whirlpool','It is known for its prominent spiral arms',60,120000),
+('Sombrero','It is distinctive due to its prominent dust lane',50,128000),
+('Centaurus','It exhibits characteristics of both elliptical and spiral galaxies',200,145000),
+('Triangulum','It is the third-largest member of the Local Group of galaxies',60,40000),
+('Pinwheel','It is known for its prominent spiral arms',170,180000);
+
+INSERT INTO star(name, description, diameter_inKm, age_millionOfYears, galaxy_id) VALUES
+('Sun','It is the star at the center of our Solar System', 2, 5, 1),
+('Betelgeuse',' It is one of the largest and most luminous stars known', 1, 9, 2),
+('Sirius','t is the brightest star in the night sky and can be seen from Earth', 4, 300, 3),
+('Proxima Centauri','It is too faint to be visible to the naked eye', 1, 5, 4),
+('Rigel','It is a blue supergiant star', 108, 10, 5),
+('Alpha Centauri','It is the closest star system to the Sun',3, 7, 6);
+
+INSERT INTO planet(name, description, diameter_inKm, age_millionOfYears, oxigen_percentage, is_flat,has_life, star_id) VALUES
+('Earth','It is our home planet', 12742, 5, 21, TRUE, TRUE, 1),
+('Mars','It is a terrestrial planet with a reddish appearance', 6779, 4.6, 0.13, FALSE, FALSE, 1),
+('Venus','It is a rocky planet known for its extremely dense atmosphere', 12104, 4.6, 0, FALSE, FALSE, 1),
+('Jupiter','It is the largest planet in our solar system', 139820, 4.6, 0, FALSE, FALSE, 1),
+('Saturn','It is a gas giant known for its prominent ring system', 116460, 4.6, 0, FALSE, FALSE, 1),
+('Mercury','It is the closest planet to the Sun', 4879, 4.6, 0, FALSE, FALSE, 1),
+('Neptune','It is the eighth and farthest known planet from the Sun', 49530, 4.6, 0.8, FALSE, FALSE, 1),
+('Uranus','It has a unique tilted axis of rotation', 50724, 4.6, 0.1, FALSE, FALSE, 1),
+('Kepler-452b','It is an exoplanet orbiting a star similar to our Sun', 30245, 6, 0.3, FALSE, TRUE, 3),
+('Proxima Centauri b','It is an exoplanet orbiting the closest known star to our Solar System', 39025, 4.9, 0.1, FALSE, FALSE, 3),
+('HD 189733b','It is an exoplanet located approximately 63 light-years away from Earth', 84256, 8, 5, FALSE, FALSE, 3),
+('TRAPPIST-1e','It is a rocky planet and part of a seven-planet system', 65123, 10, 10, FALSE, FALSE, 3);
+
+
+INSERT INTO moon(name, description, diameter_inKm, age_millionOfYears, planet_id) VALUES
+('Luna', 'The Earth natural satellite', 3474, 4.5, 1),
+('Titan', 'Saturn largest moon with a dense atmosphere', 5150, 4.2, 5),
+('Ganymede', 'Jupiter largest moon and the largest moon in the solar system', 5268, 4.8, 4),
+('Callisto', 'Jupiter second largest moon', 4820, 4.3, 4),
+('Europa', 'Jupiter moon with a subsurface ocean and potential for life', 3122, 4.6, 4),
+('Io', 'One of Jupiter Galilean moons with active volcanoes', 3637, 4.7, 4),
+('Enceladus', 'Saturn moon with geysers of water vapor', 504, 4.1, 5),
+('Triton', 'Neptune largest moon with a retrograde orbit', 2707, 4.4, 7),
+('Charon', 'Pluto largest moon', 1212, 4.0, 8),
+('Phobos', 'One of Mars moons with an irregular shape', 22, 4.9, 2),
+('Deimos', 'One of Mars moons with a small size', 12, 4.2, 2),
+('Mimas', 'Saturn moon with a prominent impact crater', 396, 4.3, 4),
+('Rhea', 'Saturn secondlargest moon', 1528, 4.5, 5),
+('Iapetus', 'Saturn moon with a two-tone coloration', 1468, 4.7, 5),
+('Dione', 'Saturn moon with distinctive surface features', 1122, 4.6, 5),
+('Hyperion', 'Saturn moon with an irregular shape and chaotic rotation', 266, 4.8, 5),
+('Oberon', 'Uranus moon with a dark surface and ancient cratered terrain', 1523, 4.4, 8),
+('Miranda', 'Uranus moon with a varied and geologically active surface', 471, 4.9, 8),
+('Ariel', 'One of Uranus moons with a young and bright surface', 1157, 4.5, 8),
+('Umbriel', 'Uranus moon with a heavily cratered surface', 1169, 4.2, 8);
+
+
+INSERT INTO continent(name, description, numberOfCountries, planet_id) VALUES
+('America', 'It is divided in three subcontinents: South, Center and North', 35, 1),
+('Europe','Also known as The Old Continent', 44, 1),
+('Asia','The largest and most populous continent', 48, 1),
+('Africa','A diverse continent known for its rich cultural heritage', 54, 1),
+('Oceania','Kangaroos kingdom', 14, 1);
